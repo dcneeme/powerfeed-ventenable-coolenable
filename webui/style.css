@@ -1,0 +1,95 @@
+/*
+	99Lime.com HTML KickStart by Joshua Gatcke
+	style.css
+
+*/
+
+@import url(Arimo400,700);
+
+h1,h2,h3,h4,h5,h6{
+font-family: "Arimo", arial, verdana, sans-serif;
+font-weight:normal;
+}
+
+thead th,
+tbody th{
+font-family: "Arimo", arial, verdana, sans-serif;
+}
+
+h4 { font-size:1.7em; color:#777;}
+
+body{
+margin:0;
+padding:0 0 0 0;
+color:#ccc;
+background:#000;
+font:normal 0.9em/150% 'Arimo', arial, verdana, sans-serif;
+text-shadow: 0 0 1px transparent; /* google font pixelation fix */
+}
+
+#wrap{
+width:100%;
+background:#fff;
+margin:30px auto 30px auto;
+padding:0 2%;
+border:1px solid #ccc;
+}
+
+
+#footer{
+text-align:center;
+padding:20px;
+margin:0;
+border-top:1px solid #ddd;
+color:#999;
+font-size:0.8em;
+text-shadow:0px 1px 1px #fff;
+position: relative;
+top:0;
+left:0;
+background:#fff;
+}
+
+.bignum {
+	font-weight:bold;
+	font-size:5em;
+	margin:20px 0;
+}
+.info { font-size:1.3em; color:#777;}
+.status0 {color:lightgreen;}
+.status1 {color:yellow;}
+.status2 {color:red;}
+.status3 {color:#333;}
+//.col_3 { width: 100px; }
+//.col_4 { width: 150px; margin-right: 0px;}
+//.col_6 { width: 250px; }
+hr {border-top: 1px solid #333;}
+
+.overlay-bg {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	height:110%;
+	width: 100%;
+	cursor: pointer;
+	background: #000; /* fallback */
+	background: rgba(0,0,0,0.75);
+}
+
+.overlay-content {
+	background: #fff;
+	padding: 1%;
+	width: 80%;
+	position: relative;
+	top: 70%;
+	left: 50%;
+	margin: 0 0 0 -40%; /* add negative left margin for half the width to center the div */
+	cursor: default;
+	border-radius: 4px;
+	box-shadow: 0 0 5px rgba(0,0,0,0.9);
+	font-size:3em;
+	font-weight:bold;
+	color:red;
+	text-align:center;
+}

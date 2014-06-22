@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html><head>
+<title>Status</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="" />
+<meta name="copyright" content="" />
+<link rel="stylesheet" type="text/css" href="kickstart.css" media="all" />                  <!-- KICKSTART -->
+<link rel="stylesheet" type="text/css" href="style.css" media="all" />                          <!-- CUSTOM STYLES -->
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="kickstart.js"></script>                                  <!-- KICKSTART -->
+</head><body>
+
+<p style="margin: 0px 0;"/>
+
+<div class="grid.flex" style="max-width: 480px; margin: 0 auto;">
+<div class="col_12">
+	<div class="col_6 left">
+		<p id="name" class="info">(name)</p>
+	</div>
+	<div class="col_6 left">
+		<p id="time" class="info">(time)</p>
+	</div>
+</div>
+<hr style="margin: 0px 0" />
+<div class="col_12">
+	<div class="col_4 center">
+	<h4>Temperatuur<br/>°C</h4>
+	<p id="TI600" class="bignum">&nbsp;</p>
+	</div>
+	
+	<div class="col_4 center">
+	<h4>Niiskus<br/>%</h4>
+	<p id="AI2" class="bignum">&nbsp;</p>
+	</div>
+	
+	<div class="col_4 center">
+	<h4>CO₂<br/>ppm</h4>
+	<p id="AI3" class="bignum">&nbsp;</p>
+	</div>
+</div>
+<hr style="margin: 0px 0" />
+<div class="col_12">
+	<div class="col_2 left">
+		<p id="vent" class="info">Vent:<br/>&nbsp;</p>
+	</div>
+	<div class="col_3 left">
+		<p id="mon" class="info">Monitor:<br/>&nbsp;</p>
+	</div>
+	<div class="col_7 left">
+		<p id="url" class="info">URL:<br/>&nbsp;</p>
+	</div>
+</div>
+</div>
+<hr style="margin: 15px 0; border-top:0;" />
+
+<div class="overlay-bg">
+	<div class="overlay-content">
+		<p id="error">VIGA!</p>
+	</div>
+</div>
+
+<script src="webui.js"></script>
+<script>
+	function setSizes() {
+		var containerWidth = $("#fc").width();
+		$("#rside").width(containerWidth - 45);
+		var screenHeight = $(window).height();
+		screenHeight = window.outerHeight;
+		$("#thecontent").height(screenHeight - 20);
+		window.scrollTo(0, 1);
+	}
+	setSizes();
+	$(window).resize(function() { setSizes(); });
+</script>
+
+</body></html>

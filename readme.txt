@@ -1,0 +1,1 @@
+siin on aichannels.sql lisatud ka wcount, sest osa ai vaartusi on 32 bitti!

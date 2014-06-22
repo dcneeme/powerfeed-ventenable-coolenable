@@ -1,0 +1,31 @@
+{
+   "modbusproxy_status" : {
+    "indicator" : [
+        { "name" : "MON ON", "status" : 0 },
+        { "name" : "LAN OFF", "status" : 2 },
+        { "name" : "USB ON", "status" : 0 }
+    ],
+    "info" : [
+      { "name" : "WLAN IP address", "value" : "176.124.247.42"},
+      { "name" : "TIME", "value" : "Sat Jan 18 19:49:22 EET 2014"}
+     ]
+     },
+   "device_status" : [ 
+    { "name" : "DC5888-2", "address" : "1", "status" : 0, "location" : "1st floor", "channel_data" : [
+       { "typenum" : 2, "typename" : "AI", "data" : [ 
+          { "address" : 2, "value" : 87, "status" : 1, "vmin" : 2 , "vmax" : -300 },
+          { "address" : 3, "value" : 3395, "status" : 2, "vmin" : 0 , "vmax" : 30 },
+        ] },
+       { "typenum" : 3, "typename" : "TI", "data" : [ 
+          { "address" : 600, "value" : 21.5, "status" : 0, "vmin" : 0 , "vmax" : 300 },
+        ] },
+       { "typenum" : 1, "typename" : "DI", "data" : [ 
+          { "address" : 1, "value" : 0, "status" : 1, "bit" : 8 },
+        ] },
+       { "typenum" : 0, "typename" : "DO", "data" : [ 
+          { "address" : 0, "value" : 0, "status" : 1, "bit" : 8 },
+        ] }
+      ]
+    }
+  ]
+}

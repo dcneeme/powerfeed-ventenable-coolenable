@@ -1,0 +1,12 @@
+@font-face {
+  font-family: 'Arimo';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Arimo'), url(BkZwJXYnumPMepfEA344yQ.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Arimo';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Arimo Bold'), local('Arimo-Bold'), url(eFfAHNfFT0YtF77QmRKRj_esZW2xOQ-xsNqO47m55DA.ttf) format('truetype');
+}
