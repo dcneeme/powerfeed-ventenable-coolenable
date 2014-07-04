@@ -15,7 +15,7 @@ CREATE TABLE dochannels(mba,regadd,bit,bootvalue,value,ts,rule,desc,comment,mbi 
 -- it is possible to combine values from different modbus slaves and registers into one service. 
 -- possible status values are 0..3
 
--- INSERT INTO "dochannels" VALUES('9','0','8','0','0','','','output DO1','niisutus 0100',0); --  kompressor
+INSERT INTO "dochannels" VALUES('0','0','8','0','0','','','output DO1','mitsu keeld 0100',0); --  mitsu kinni kui 1
 
 
 -- the rule number column is provided just in case some application needs them. should be uniquely indexed!

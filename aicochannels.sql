@@ -35,7 +35,7 @@ CREATE TABLE aicochannels(mba,regadd,val_reg,member,cfg,x1,x2,y1,y2,outlo,outhi,
 -- hi lo voetakse viidatud lisateenustest, kui viide olemas on. eristamine member nr alusel.    loref, hiref only for triggers!
 
 -- dio bitmap testiks
-INSERT INTO "aicochannels" VALUES('1','1','D1V','1','17','0','100','0','100','200','250','2','','','110','0','','di bitmap','h',3,0,2,'',''); 
+-- INSERT INTO "aicochannels" VALUES('1','1','D1V','1','17','0','100','0','100','200','250','2','','','110','0','','di bitmap','h',3,0,2,'',''); ++ jagada 65k? mugavam oleks bitikaupa...
 
 -- voltage
 INSERT INTO "aicochannels" VALUES('44','769','V1W','1','18','0','100','0','100','200','250','2','','','110','0','','voltage phase1 mV','h',3,0,2,'4','5'); -- actual voltage mV (V initially, must be overwritten in member chg)
@@ -51,34 +51,38 @@ INSERT INTO "aicochannels" VALUES('','','V2W','4','','','','','','','1','','',''
 INSERT INTO "aicochannels" VALUES('','','V2W','5','','','','','','1','','','','','250000','','','lo limit mV','s!',3,0,2,'',''); -- min mV, value to member 1 lo
 
 -- current
-INSERT INTO "aicochannels" VALUES('44','781','A1W','1','18','0','100','0','100','200','250','2','','','110','0','','voltage phase1 mV','h',3,0,2,'4','5'); -- actual current mA 
-INSERT INTO "aicochannels" VALUES('44','785','A1W','2','18','0','100','0','100','210','270','2','','','110','0','','voltage phase1 mV','h',3,0,2,'4','5'); -- 
-INSERT INTO "aicochannels" VALUES('44','789','A1W','3','18','0','100','0','100','200','270','2','','','110','0','','voltage phase1 mV','h',3,0,2,'4','5'); -- 
-INSERT INTO "aicochannels" VALUES('','','A1W','4','','','','','','','1','','','','100000','','','hi limit mA','s!',3,0,2,'',''); -- max current, value to member 2 hi using trigger
-INSERT INTO "aicochannels" VALUES('','','A1W','5','','','','','','1','','','','','250000','','','lo limit mA','s!',3,0,2,'',''); -- min current mA, value to member 1 lo
+INSERT INTO "aicochannels" VALUES('44','781','A1W','1','20','0','100','0','100','200000','225000','2','','','110','0','','current phase1 mA','h',3,0,2,'4','5'); -- actual current mA 
+INSERT INTO "aicochannels" VALUES('44','785','A1W','2','20','0','100','0','100','200000','225000','2','','','110','0','','current phase1 mA','h',3,0,2,'4','5'); -- 
+INSERT INTO "aicochannels" VALUES('44','789','A1W','3','20','0','100','0','100','200000','225000','2','','','110','0','','current phase1 mA','h',3,0,2,'4','5'); -- 
+INSERT INTO "aicochannels" VALUES('','','A1W','4','','','','','','','1','','','','200000','','','hi limit mA','s!',3,0,2,'',''); -- max current, value to member 2 hi using trigger
+INSERT INTO "aicochannels" VALUES('','','A1W','5','','','','','','1','','','','','225000','','','lo limit mA','s!',3,0,2,'',''); -- min current mA, value to member 1 lo
 
-INSERT INTO "aicochannels" VALUES('43','781','A2W','1','18','0','100','0','100','200','250','2','','','110','0','','voltage phase1 mA','h',3,0,2,'4','5'); -- actual voltage mV (V initially, must be overwritten in member chg)
-INSERT INTO "aicochannels" VALUES('43','785','A2W','2','18','0','100','0','100','210','270','2','','','110','0','','voltage phase1 mA','h',3,0,2,'4','5'); -- 
-INSERT INTO "aicochannels" VALUES('43','789','A2W','3','18','0','100','0','100','200','270','2','','','110','0','','voltage phase1 mA','h',3,0,2,'4','5'); -- 
-INSERT INTO "aicochannels" VALUES('','','A2W','4','','','','','','','1','','','','100000','','','hi limit mA','s!',3,0,2,'',''); -- max mA, value to member 2 hi using trigger
-INSERT INTO "aicochannels" VALUES('','','A2W','5','','','','','','1','','','','','250000','','','lo limit mA','s!',3,0,2,'',''); -- min mA, value to member 1 lo
+INSERT INTO "aicochannels" VALUES('43','781','A2W','1','20','0','100','0','100','200000','225000','2','','','110','0','','current phase1 mA','h',3,0,2,'4','5'); -- actual voltage mV (V initially, must be overwritten in member chg)
+INSERT INTO "aicochannels" VALUES('43','785','A2W','2','20','0','100','0','100','200000','225000','2','','','110','0','','current phase1 mA','h',3,0,2,'4','5'); -- 
+INSERT INTO "aicochannels" VALUES('43','789','A2W','3','20','0','100','0','100','200000','225000','2','','','110','0','','current phase1 mA','h',3,0,2,'4','5'); -- 
+INSERT INTO "aicochannels" VALUES('','','A2W','4','','','','','','','1','','','','200000','','','hi limit mA','s!',3,0,2,'',''); -- max mA, value to member 2 hi using trigger
+INSERT INTO "aicochannels" VALUES('','','A2W','5','','','','','','1','','','','','225000','','','lo limit mA','s!',3,0,2,'',''); -- min mA, value to member 1 lo
+
+-- INSERT INTO "aicochannels" VALUES('','','L1W','1','','','','','','','1','','','','500','','','hi limit mA','s!',3,0,2,'2','3'); -- load % w limits thresholds
+-- INSERT INTO "aicochannels" VALUES('','','L1W','2','','','','','','1','','','','','800','','','lo limit mA','s!',3,0,2,'',''); -- allow if below-- INSERT INTO "aicochannels" VALUES('','','L1W','3','','','','','','1','','','','','900','','','lo limit mA','s!',3,0,2,'',''); -- limit if above
+
 
 -- heat pump 1
-INSERT INTO "aicochannels" VALUES('1','202','1H1W','1','17','0','100','0','100','0','500','','','','110','','','h1 supply temp','h',3,1,2,'',''); -- h1 supply temp 1/10 deg
-INSERT INTO "aicochannels" VALUES('1','204','1H1W','2','17','0','100','0','100','0','500','','','','110','','','h2 supply temp','h',3,1,2,'',''); -- h1 return temp
+-- INSERT INTO "aicochannels" VALUES('1','202','1H1W','1','17','0','100','0','100','0','500','','','','110','','','h1 supply temp','h',3,1,2,'',''); -- h1 supply temp 1/10 deg
+-- INSERT INTO "aicochannels" VALUES('1','204','1H1W','2','17','0','100','0','100','0','500','','','','110','','','h2 supply temp','h',3,1,2,'',''); -- h1 return temp
 
-INSERT INTO "aicochannels" VALUES('1','274','1H2W','1','17','0','100','0','100','0','500','','','','110','','','h1 supply temp','h',3,1,2,'',''); -- h1 supply temp 1/10 deg
-INSERT INTO "aicochannels" VALUES('1','223','1H2W','2','17','0','100','0','100','0','500','','','','110','','','h2 supply temp','h',3,1,2,'',''); -- h1 return temp
+-- INSERT INTO "aicochannels" VALUES('1','274','1H2W','1','17','0','100','0','100','0','500','','','','110','','','h1 supply temp','h',3,1,2,'',''); -- h1 supply temp 1/10 deg
+-- INSERT INTO "aicochannels" VALUES('1','223','1H2W','2','17','0','100','0','100','0','500','','','','110','','','h2 supply temp','h',3,1,2,'',''); -- h1 return temp
 
 -- INSERT INTO "aicochannels" VALUES('1','621','1CSV','2','17','0','100','0','100','0','500','','','','110','','','cooling set','h',3,1,1,'',''); -- cooling setpoint_
 
 
 -- heat pump 2
-INSERT INTO "aicochannels" VALUES('1','202','2H1W','1','17','0','100','0','100','0','500','','','','110','','','h1 supply temp','h',3,2,2,'',''); -- h1 supply temp 1/10 deg
-INSERT INTO "aicochannels" VALUES('1','204','2H1W','2','17','0','100','0','100','0','500','','','','110','','','h2 supply temp','h',3,2,2,'',''); -- h1 return temp
+-- INSERT INTO "aicochannels" VALUES('1','202','2H1W','1','17','0','100','0','100','0','500','','','','110','','','h1 supply temp','h',3,2,2,'',''); -- h1 supply temp 1/10 deg
+-- INSERT INTO "aicochannels" VALUES('1','204','2H1W','2','17','0','100','0','100','0','500','','','','110','','','h2 supply temp','h',3,2,2,'',''); -- h1 return temp
 
-INSERT INTO "aicochannels" VALUES('1','274','2H2W','1','17','0','100','0','100','0','500','','','','110','','','h1 supply temp','h',3,2,2,'',''); -- h1 supply temp 1/10 deg
-INSERT INTO "aicochannels" VALUES('1','223','2H2W','2','17','0','100','0','100','0','500','','','','110','','','h2 supply temp','h',3,2,2,'',''); -- h1 return temp
+-- INSERT INTO "aicochannels" VALUES('1','274','2H2W','1','17','0','100','0','100','0','500','','','','110','','','h1 supply temp','h',3,2,2,'',''); -- h1 supply temp 1/10 deg
+-- INSERT INTO "aicochannels" VALUES('1','223','2H2W','2','17','0','100','0','100','0','500','','','','110','','','h2 supply temp','h',3,2,2,'',''); -- h1 return temp
 
 -- INSERT INTO "aicochannels" VALUES('1','621','2CSV','1','17','0','100','0','100','0','500','','','','110','','','cooling set','h',3,2,1,'',''); -- cooling setpoint_
 

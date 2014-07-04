@@ -41,17 +41,15 @@ r.set_host_ip(ip)
 
 udp.setID(mac) # env muutuja kaudu ehk parem?
 tcp.setID(mac) # 
-udp.setIP('46.183.73.35')
+udp.setIP('195.222.15.51') # ('46.183.73.35') # mon server ip. only 195.222.15.51 has access to starman
 udp.setPort(44445)
 
-#from droidcontroller.achannels import *
 from droidcontroller.acchannels import *
-#from droidcontroller.dchannels import *
+from droidcontroller.dchannels import *
 
-# the following instances are subclasses of SQLgeneral. why?
-#a=Achannels(readperiod = 10, sendperiod = 120) # both ai and ao
-#d=Dchannels(readperiod = 0, sendperiod = 180) # di and do. immediate notification, read as often as possible.
-ac=ACchannels(in_sql = 'aicochannels.sql', readperiod = 5, sendperiod = 60) # counters, power. also 32 bit ai! trigger in aichannels
+# the following instances are subclasses of SQLgeneral.
+d=Dchannels(readperiod = 0, sendperiod = 180) # di and do. immediate notification, read as often as possible.
+ac=ACchannels(in_sql = 'aicochannels.sql', readperiod = 5, sendperiod = 30) # counters, power. also 32 bit ai! trigger in aichannels
 
 s.check_setup('aicochannels')
 #s.check_setup('dichannels')
@@ -65,8 +63,7 @@ s.set_apver(APVER) # set version
 def comm_doall():
     ''' Handle the communication with io channels via modbus and the monitoring server  '''
     udp.unsent() # vana jama maha puhvrist
-    #d.doall()  #  di koik mis vaja, loeb tihti, raporteerib muutuste korral ja aeg-ajalt asynkroonselt
-    #c.doall() # loeb ja vahel ka raporteerib
+    d.doall()  #  di koik mis vaja, loeb tihti, raporteerib muutuste korral ja aeg-ajalt asynkroonselt
     ac.doall() # ai koik mis vaja, loeb ja vahel raporteerib
     for mbi in range(len(mb)): # check modbus connectivity
         mberr=mb[mbi].get_errorcount()
@@ -76,10 +73,10 @@ def comm_doall():
                         
     r.regular_svc(svclist = ['ULW','UTW','ip']) # UTW,ULW are default. also forks alive processes!
     got = udp.comm() # loeb ja saadab udp, siin 0.1 s viide sees. tagastab {} saadud key:value vaartustega
-    if got != None: # got something from monitoring server
+    if got != {} and got != None: # got something from monitoring server
+        ac.parse_udp(got) # chk if setup or counters need to be changed
+        d.parse_udp(got) # chk if setup ot toggle for di
         todo=p.parse_udp(got) # any commands or setup variables from server?
-        
-        
         
         
         
@@ -98,47 +95,22 @@ def comm_doall():
         
         
 def app_doall():
-    ''' Application rules and logic, via services if possible  '''
-    global ts, LRW_ts
+    ''' Application rules and logic for energy metering and consumption limiting, via services if possible  '''
+    global ts,A1W,A2W,A2limited,R2value
     try:
-        LAWchange=0
-        LSW=s.get_value('LSW','dichannels') # bin ana selector / lighting sensors
-        SensorMode=LSW[2] # member 3 is sensor selector, 0=D, 1=A
-        LAW=s.get_value('LAW','aichannels') # analogue light sensor and thresholds on off
-        LRW=s.get_value('LRW','dichannels') # lighting control, out sens cal remote
-        
-        #print('app_doall 0: LAW LSW LRW',LAW,LSW,LRW) # debug
-
-        if LAW[0] > LAW[2]: #switch off threshold crossed
-            s.set_membervalue('LSW',2,0,'dichannels') # sensor svs modified, analogue to binary, member 2!
-            LAWchange=1
-        elif LAW[0] < LAW[1]: # switch on threshold crossed
-            s.set_membervalue('LSW',2,1,'dichannels') # 
-            LAWchange=1
-        if LAWchange > 0 and SensorMode >0: # reread LSW
-            LSW=s.get_value('LSW','dichannels') # LSW REREAD
-        
-        #print('app_doall 1: LAW LSW LRW',LAW,LSW,LRW) # debug
-        
-        #LRW member update, from bi or ana sensor
-        if SensorMode == 0: # binary sensor enabled
-            s.set_membervalue('LRW',2,LSW[0],'dichannels') # binary sensor state to LRW member2
-        else: # analogue sensor
-            s.set_membervalue('LRW',2,LSW[1],'dichannels') # binary sensor state to LRW member2
-        
-        LRW=s.get_value('LRW','dichannels') # LRW REREAD
-        #print('app_doall 2: LAW LSW LRW',LAW,LSW,LRW) # debug
-        
-        # actual control based on input variables (sensor, calendar, remote)
-        
-        #print('LRW',LRW) # debug
-        if round(LRW[0]) != round((LRW[1]|LRW[2]|LRW[3])): # relay toggle needed if any of the input parameters is not 0
-            s.setby_dimember_do('LRW',1,(LRW[1]|LRW[2]|LRW[3])) # svc, member, value. writing dochannel that corresponds to the given member of LRW        
-            msg='changed lighting state to '+str(LRW[1]|LRW[2]|LRW[3])
-            LRW=s.get_value('LRW','dichannels') # LRW REREAD
-            LRW_ts=ts
-        #print('app_doall 3: LAW LSW LRW',LAW,LSW,LRW) # debug
-    
+        # get_value() returns raw,value,lo,hi,status values based on service name and member number
+        A2W=ac.make_svc('A2W','A2S') # returns [sta_reg,status,val_reg,values], values are space separated
+        if A2W[1] == 0: # svc status normal
+            if A2limited >0:
+                A2limited -= 1
+        else: # svc status not normal
+            if A2limited <3:
+                A2limited += 1
+        #R2value=str(int(A2limited>0))+' '+str(int(A2limited>1))+' '+str(int(A2limited>2))
+        d.set_divalue('R2W',1,int(A2limited>0))
+        d.set_divalue('R2W',2,int(A2limited>1))
+        d.set_divalue('R2W',3,int(A2limited>2))
+        # 0=nolimits, 1=mitsuoff, 2=cooloff, 3=ventoff
     except:
         msg='main: app logic error!'
         print(msg)
@@ -170,6 +142,10 @@ def crosscheck(): # FIXME: should be autoadjustable to the number of counter sta
  ################  MAIN #################
 ts=time.time() # needed for manual function testing
 LRW_ts=ts
+A1W=[]
+A2W=[]
+A2limited=0
+R2value=[0,0,0]
 
 if __name__ == '__main__':
     #kontrollime energiamootjate seisusid. koik loendid automaatselt?
@@ -184,7 +160,7 @@ if __name__ == '__main__':
     while stop == 0: # endless loop 
         ts=time.time() # global for functions
         comm_doall()  # communication with io and server
-        #app_doall() # application rules and logic, via services if possible 
+        app_doall() # application rules and logic, via services if possible 
         #crosscheck() # check for phase consumption failures 
         # #########################################
         
