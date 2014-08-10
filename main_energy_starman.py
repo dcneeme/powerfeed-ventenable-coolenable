@@ -1,8 +1,12 @@
 #!/usr/bin/python
 
-APVER='energy_starman' # for olinuxino
+APVER='energy_starman 09.08.2014' # for olinuxino
 
 #####################################################
+
+import logging
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG) # change as needed ##################
 
 import os
 
@@ -17,20 +21,28 @@ except:
 OSTYPE='archlinux'
 print('OSTYPE',OSTYPE)   
 
-from droidcontroller.udp_commands import * # sellega alusta, kakaivitab ka SQlgeneral
+from droidcontroller.udp_commands import * # sellega alusta, kaivitab ka SQlgeneral
+from droidcontroller.loadlimit import * # load limitation level 0..3 to be calculation
+
 p=Commands(OSTYPE) # setup and commands from server
 r=RegularComm(interval=120) # variables like uptime and traffic, not io channels
+l=LoadLimit(currentlevel=3, maxlevel=3, \
+            leveldelay=30, \
+          currentdelay=10, \
+              lo_limit=180000, \
+              hi_limit=200000, phasecount=3)
+# use l.set_lo_limit(value_mA) to set another limit
 
 if os.environ['HOSTNAME'] == 'server': # test linux  
     mac_ip=p.subexec('./getnetwork.sh',1).decode("utf-8").split(' ')
     mac='000101100002' # replace! CHANGE THIS!
-    print('replaced mac to',mac_ip)
+    log.warning('replaced mac to',mac_ip)
 elif os.environ['HOSTNAME'] == 'olinuxino':
     mac_ip=p.subexec('/root/d4c/getnetwork.sh',1).decode("utf-8").split(' ')
 elif os.environ['HOSTNAME'] == 'techbase':
     mac_ip=p.subexec('/mnt/nand-user/d4c/getnetwork.sh',1).decode("utf-8").split(' ')
 else:
-    print('unknown hostname! cannot start!')
+    log.critical('unknown hostname! cannot start!')
     time.sleep(60)
     sys.exit()
     
@@ -96,48 +108,38 @@ def comm_doall():
         
 def app_doall():
     ''' Application rules and logic for energy metering and consumption limiting, via services if possible  '''
-    global ts,A1W,A2W,A2limited,R2value
-    try:
-        # get_value() returns raw,value,lo,hi,status values based on service name and member number
-        A2W=ac.make_svc('A2W','A2S') # returns [sta_reg,status,val_reg,values], values are space separated
-        if A2W[1] == 0: # svc status normal
-            if A2limited >0:
-                A2limited -= 1
-        else: # svc status not normal
-            if A2limited <3:
-                A2limited += 1
-        #R2value=str(int(A2limited>0))+' '+str(int(A2limited>1))+' '+str(int(A2limited>2))
-        d.set_divalue('R2W',1,int(A2limited>0))
-        d.set_divalue('R2W',2,int(A2limited>1))
-        d.set_divalue('R2W',3,int(A2limited>2))
-        # 0=nolimits, 1=mitsuoff, 2=cooloff, 3=ventoff
-    except:
-        msg='main: app logic error!'
-        print(msg)
-        udp.syslog(msg)
-        traceback.print_exc()
-        time.sleep(5)
-        
+    A2W = s.get_value('A2W','aicochannels')
+    current = A2W[0:3] # phase currents mA
+    lo_limit = A2W[3]
+    hi_limit = A2W[4]
+    # if l.get_lo_limit() != lo_limit:
+    #    l.set_lo_limit()
+    # if l.get_hi_limit() != hi_limit:
+    #    l.set_hi_limit(hi_limit)
+    
+    print('current',current) 
+    log.info('current')
+    limitlevel = l.output(current) # 0..3 (from no limits to max)
+    # set limitlevel service values
+    s.set_membervalue('LLW', member=1, value=limitlevel, table='aicochannels') # KoormusPiirang
+    #set outputs to disconnect loads if needed
+    mitsustate = s.getbit_do(mbi=0, mba=1, regadd=0, bit=9) # mitsu deactivation state
+    if mitsustate == None:
+        log.warning('invalid dochannels, missing record for bit 9?')
+    if limitlevel > 0:
+        mitsuoff = 1
+    else:
+        mitsuoff = 0
+    if mitsustate != mitsuoff:
+        s.setbit_do(bit=9, value=mitsuoff, mba=1, regadd=0, mbi=0) # deactivate mitsu cooler
+        print('limitlevel ' + str(limitlevel) + ', mitsu cooler state change from ' + str(mitsustate) + ' to ' + str(mitsuoff))
+    
+    
 
 def crosscheck(): # FIXME: should be autoadjustable to the number of counter state channels RxyV
     ''' Report failure states (via dichannels) depending on other states (from counters for example) '''
-    global ts, LRW_ts
-    LRW=s.get_value('LRW','dichannels') # LRW REREAD
+    pass
     
-    services=s.get_column('counters','val_reg','R__V') # table,column,like = ''
-    for svc in services:
-        feeder=svc[1]
-        phase=svc[2]
-        try:
-            phasestate=s.get_value('R'+feeder+phase+'V','counters')[0]  # must not be empty!! should be ok in the end when values appear
-            if ts > LRW_ts + 20: # time to check if state based on power is the same as LRW[0]. off_tout = 10
-                s.set_membervalue('F'+feeder+'W', eval(phase),(LRW[0]^phasestate),'dichannels') # for 3in1 service, members are phases
-                #s.set_membervalue('F'+feeder+phase'S', 1,(LRW[0]^phasestate),'dichannels') # for 1by1 service, always member 1
- 
-        except:
-            print('feeder,phase',feeder+1,phase+1) # debug
-            traceback.print_exc()
-            time.sleep(5)
     
  ################  MAIN #################
 ts=time.time() # needed for manual function testing
