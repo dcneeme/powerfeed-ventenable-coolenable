@@ -73,13 +73,15 @@ class VentEnable(PowerFeed):
             log.info('all controlled loads to be disconnected')
             return self.maxlevel
             
+        log.debug('ts_level='+str(self.ts_level)+', ts_current='+str(pwr.ts_feedercurrent[self.ventfeeder]))
         for i in range(pwr.phasecount):
             # the values for i are 0 1 2 for 3 phases
-            if pwr.feedercurrent[self.ventfeeder][i]  == None:
+            if pwr.feedercurrent[self.ventfeeder][i] == None:
                 #no valid value yet, do nothing
                 log.warning('no change to self.limitlevel due to invalid feedercurrent')
                 return self.limitlevel # stop
 
+            log.debug('phase='+str(i+1)+', current='+str(pwr.feedercurrent[self.ventfeeder][i])+', limit='+str(pwr.feederlimit[self.ventfeeder]))
             if (pwr.feedercurrent[self.ventfeeder][i] > pwr.feederlimit[self.ventfeeder] \
                     and self.limitlevel < self.maxlevel):
                 updn += pwr.phasecount # to ensure detection
@@ -97,11 +99,15 @@ class VentEnable(PowerFeed):
             self.ts_level = tsnow
             log.info('limitations to be set') #  due to feedercurrent '+str(feedercurrent))
             print('limitations to be set, level',self.limitlevel) # temporary
-        elif (updn == -pwr.phasecount and tsnow > self.leveldelay + self.ts_level \
-                and pwr.ts_feedercurrent[self.ventfeeder] < tsnow - self.currentdelay and self.limitlevel > 0):
+        elif (updn == -pwr.phasecount \
+                and tsnow > self.leveldelay + self.ts_level \
+                and self.limitlevel > 0):
             self.limitlevel += -1
             self.ts_level = tsnow
             log.info('limitations decrease ') # to '+str(self.limitlevel))
             print('limitations decrease, level',self.limitlevel) # temporary
-
+        else:
+            log.info('no change to limitlevel updn='+str(updn)+', ts_notlo age='+str(tsnow - self.ts_notlocurrent)+ \
+                ', ts_level age='+str(tsnow - self.ts_level))
+            
         return self.limitlevel
