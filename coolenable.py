@@ -45,21 +45,25 @@ class CoolEnable(PowerFeed):
     ventilatsioonile ja mitsu jahutusele.
     """
     def __init__(self, zonecount=4, \
-                       cooler1count=2, \
-                       cooler2count=4, \
-                     cooler1current=[50000, 50000], \
-                     cooler2current=[25000, 24000, 25000, 24000], \
-                    zoneservicemap1=[1,2,1,3], \
-                    zoneservicemap2=[1,6,6,8], \
-                        zonetempset=[250, 260 , 270, 260], \
-                       currentdelay=10, \
-                        enabledelay=30):
+                    cooler1count=2, \
+                    cooler2count=4, \
+                  cooler1current=[50000, 50000], \
+                  cooler2current=[25000, 24000, 25000, 24000], \
+                  cooler1maxtemp=[150,150], \
+                     cooler1temp=[10,10], \
+                 zoneservicemap1=[1,2,1,3], \
+                 zoneservicemap2=[1,6,6,8], \
+                     zonetempset=[250, 260 , 270, 260], \
+                    currentdelay=10, \
+                     enabledelay=30):
 
         self.zonecount = zonecount # zone has temperature and relates to coolers
-        self.cooler1count = cooler1count
-        self.cooler2count = cooler2count
-        self.cooler1current = cooler1current # max consumption mA
-        self.cooler2current = cooler2current
+        self.cooler1count = cooler1count # primary coolers
+        self.cooler2count = cooler2count # secondary coolers
+        self.cooler1current = cooler1current # max primary coolers consumptions mA
+        self.cooler2current = cooler2current # max secondary coolers consumptions mA
+        self.cooler1maxtemp = cooler1maxtemp # max cooling agent tempeature
+        self.cooler1temp = cooler1temp # actual cooling agent temperature
         self.zoneservicemap1 = zoneservicemap1 # primary to zones
         self.zoneservicemap2 = zoneservicemap2 # secondary to zones
         self.zonetempset = zonetempset # temperature setpoints for zones
@@ -68,9 +72,10 @@ class CoolEnable(PowerFeed):
         self.cooler1enable = [1, 1] # output tuple for primary coolers enable
         self.cooler2enable = [0, 0, 0, 0] # output tuple for secondary coolers enable
 
-        self.set_cooler1feeder([0, 0])
-        self.set_cooler2feeder([1, 1, 1, 1])
-        self.set_zonetemp = [200, 200, 200, 200]  # ddegC
+        self.set_cooler1feeder([0, 0]) # power source for primary cooling
+        self.set_cooler2feeder([1, 1, 1, 1]) # power source for secondary cooling
+        #the sources are usually changed together, still possible to distribute differently
+        self.set_zonetemp = [None, None, None, None]  # temperature in zones ddegC
 
         log.info('CoolEnable init done')
 
@@ -110,7 +115,8 @@ class CoolEnable(PowerFeed):
 
     def output(self):
         """Returns enable tuples for both primary and secondary coolers
-        based on currents in feeders and coolers to feeders usage mapping """
+        based on currents in feeders and coolers to feeders usage mapping.
+        """
         # correct coolerXfeeder and zonetemp variables must be set
         tsnow = time.time()
 
